@@ -26,10 +26,11 @@ func getRemoteWindow() uintptr {
 // Returns `0` if there an error, but the property may also return `0` as well
 func GetProperty(property uint) (uint, error) {
 	window := getRemoteWindow()
+
 	result, _, err := internal.SendMessage.Call(window, AIMP_WMProperty, uintptr(property|AIMP_NotifyPropertyGet), 0)
 	if !errors.Is(err, windows.ERROR_SUCCESS) {
-		fmt.Println("AIMP-RemoteApi errored while sending get message:", err.Error())
-		return 0, errors.New("Failed to send message to Remote API window.")
+		fmt.Println("AIMP-RemoteApi error when sending Get message:", err.Error())
+		return 0, errors.New("Failed to send message to Remote API window. (" + err.Error() + ")")
 	}
 
 	return uint(result), nil
@@ -39,8 +40,9 @@ func GetProperty(property uint) (uint, error) {
 // See constants under `AIMP_NotifyProperty...` for available properties.
 func SetProperty(property uint, value int) {
 	window := getRemoteWindow()
+
 	_, _, err := internal.SendMessage.Call(window, AIMP_WMProperty, uintptr(property|AIMP_NotifyPropertySet), uintptr(value))
 	if !errors.Is(err, windows.ERROR_SUCCESS) {
-		fmt.Println("AIMP-RemoteApi errored while sending set message:", err.Error())
+		fmt.Println("AIMP-RemoteApi error when sending Set message:", err.Error())
 	}
 }

@@ -44,22 +44,25 @@ func GetCurrentTrack() (*AIMPTrackInfo, error) {
 	className, _ := windows.UTF16PtrFromString(AIMPRemoteAccessClass)
 	handle, _, err := internal.OpenFileMapping.Call(windows.FILE_MAP_READ, 1, uintptr(unsafe.Pointer(className)))
 	if !errors.Is(err, windows.ERROR_SUCCESS) {
-		fmt.Println("AIMP-RemoteApi error on acceessing file mapping:", err.Error())
-		return nil, errors.New("Unable to access AIMP IPC file map.")
+		fmt.Println("AIMP-RemoteApi error on opening file mapping:", err.Error())
+		return nil, errors.New("Unable to open AIMP's remote file map. (" + err.Error() + ")")
 	}
 
 	view, _, _ := internal.MapViewOfFile.Call(handle, windows.FILE_MAP_READ, 0, 0, uintptr(AIMPRemoteAccessMapFileSize))
 	if view == 0 {
-		fmt.Println("AIMP-RemoteApi error on mapping file map handle:", err.Error())
-		return nil, errors.New("Unable to map file mapping from AIMP.")
+		fmt.Println("AIMP-RemoteApi error on file mapping handle:", err.Error())
+		return nil, errors.New("Unable to view file mapping. (" + err.Error() + ")")
 	}
+
 	defer cleanup(handle, view)
 
-	// the data stored as a file map is stored in the result of the map call above, which is an address
-	// unsafe.Pointer normally says converting uintptr back to Pointer isn't correct, but the result isn't usable otherwise
+	// the result stored in `view` is the address to where the file map is
+	// unsafe.Pointer tells us that this usage probably isn't correct,
+	//   though i believe this is pretty much how it works in c/c++
 	rawFileInfo := *(*[AIMPRemoteAccessMapFileSize]byte)(unsafe.Pointer(view))
 	fileInfo := unpackFileInfo(rawFileInfo[:])
 
+	// the order is always the same from what i've found
 	lengths := []int{
 		int(fileInfo.AlbumLength),
 		int(fileInfo.ArtistLength),
@@ -69,10 +72,7 @@ func GetCurrentTrack() (*AIMPTrackInfo, error) {
 		int(fileInfo.TitleLength),
 	}
 
-	fmt.Println(lengths)
-
 	values := []string{}
-
 	data := rawFileInfo[getStructSize():]
 	for i := range lengths {
 		offset := 0
@@ -85,6 +85,7 @@ func GetCurrentTrack() (*AIMPTrackInfo, error) {
 
 		widestring := []uint16{}
 		for w := 2; w <= (lengths[i] * 2); w += 2 {
+			// assemble uint16 out of 2 bytes since it'll need to be decoded as a utf16 string
 			char := (uint16(data[offset+w]) << 8) + uint16(data[offset+w+1])
 			widestring = append(widestring, char)
 		}
@@ -93,6 +94,7 @@ func GetCurrentTrack() (*AIMPTrackInfo, error) {
 		values = append(values, str)
 	}
 
+	// there probably is a better way of doing this
 	file := AIMPTrackInfo{
 		Album:    values[0],
 		Artist:   values[1],
