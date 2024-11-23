@@ -9,14 +9,6 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-var blank = AIMPTrackInfo{
-	Title:    "Unavailable",
-	Album:    "Unavailable",
-	FileName: "Unavailable",
-	Genre:    "Unavailable",
-	Date:     "Unavailable",
-}
-
 func cleanup(handle uintptr, view uintptr) {
 	internal.UnmapViewOfFile.Call(view)
 	internal.CloseHandle.Call(handle)
@@ -42,11 +34,11 @@ func GetCurrentTrack() (*AIMPTrackInfo, error) {
 
 	// the result stored in `view` is the address to where the file map is
 	// unsafe.Pointer tells us that this usage probably isn't correct,
-	//   though i believe this is pretty much how it works in c/c++
+	//   though i believe this is pretty much how it works in windows w/ c/c++
 	rawFileInfo := *(*[AIMPRemoteAccessMapFileSize]byte)(unsafe.Pointer(view))
 	fileInfo := unpackFileInfo(rawFileInfo[:])
 
-	// the order is always the same from what i've found
+	// hardcoded because the order is always the same
 	lengths := []int{
 		int(fileInfo.AlbumLength),
 		int(fileInfo.ArtistLength),
@@ -62,14 +54,14 @@ func GetCurrentTrack() (*AIMPTrackInfo, error) {
 		offset := 0
 		if i > 0 {
 			for v := 0; v < i; v++ {
-				// multiply by 2 since we're dealing with utf16 (2 bytes / 16 bits)
+				// multiply by 2 since we're dealing with utf16 (2 bytes / 16 bits per char)
 				offset += lengths[v] * 2
 			}
 		}
 
 		widestring := []uint16{}
 		for w := 2; w <= (lengths[i] * 2); w += 2 {
-			// assemble uint16 out of 2 bytes since it'll need to be decoded as a utf16 string
+			// assemble uint16 out of 2 bytes since `windows.UTF16ToString` uses that datatype instead
 			char := (uint16(data[offset+w]) << 8) + uint16(data[offset+w+1])
 			widestring = append(widestring, char)
 		}
