@@ -1,6 +1,6 @@
 package aimpremoteapi
 
-import "gitbub.com/zekothefox/aimp-remoteapi/pkgs/internal"
+import "github.com/zekothefox/aimp-remoteapi/pkgs/internal"
 
 // This file is heavily based off of `apiRemote.h` from the AIMP Developer SDK.
 //

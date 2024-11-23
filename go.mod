@@ -1,4 +1,4 @@
-module gitbub.com/zekothefox/aimp-remoteapi
+module github.com/zekothefox/aimp-remoteapi
 
 go 1.23.3
 

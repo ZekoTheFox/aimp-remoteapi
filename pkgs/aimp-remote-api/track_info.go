@@ -3,10 +3,9 @@ package aimpremoteapi
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"unsafe"
 
-	"gitbub.com/zekothefox/aimp-remoteapi/pkgs/internal"
+	"github.com/zekothefox/aimp-remoteapi/pkgs/internal"
 	"golang.org/x/sys/windows"
 )
 
@@ -16,21 +15,6 @@ var blank = AIMPTrackInfo{
 	FileName: "Unavailable",
 	Genre:    "Unavailable",
 	Date:     "Unavailable",
-}
-
-func readByte(pointer unsafe.Pointer) byte {
-	b := *(*byte)(pointer) // scallop activity
-	return b
-}
-
-func getString(pointer unsafe.Pointer, length int) string {
-	bytestring := []byte{}
-
-	for i := 0; i < length; i++ {
-		bytestring = append(bytestring, readByte(unsafe.Add(pointer, i)))
-	}
-
-	return strings.TrimSpace(string(bytestring))
 }
 
 func cleanup(handle uintptr, view uintptr) {

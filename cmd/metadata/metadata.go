@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	aimpremoteapi "gitbub.com/zekothefox/aimp-remoteapi/pkgs/aimp-remote-api"
+	aimpremoteapi "github.com/zekothefox/aimp-remoteapi/pkgs/aimp-remote-api"
 )
 
 func main() {

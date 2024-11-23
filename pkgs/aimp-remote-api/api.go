@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"unsafe"
 
-	"gitbub.com/zekothefox/aimp-remoteapi/pkgs/internal"
+	"github.com/zekothefox/aimp-remoteapi/pkgs/internal"
 	"golang.org/x/sys/windows"
 )
 
