@@ -17,7 +17,7 @@ AIMP needs to be open in order to send messages and access player information.
 -   Genre
 -   File location/path
 
-More information about the file can be queried using `GetProperty(...)`, see `constants.go` for commands list.
+More information about the file can be queried using `GetProperty(...)`, see `constants.go` for commands list. (`AIMP_NotifyCmd*`)
 
 Currently only tested for Windows; AIMP for Linux support is not specifically included and unknown if works.
 
@@ -26,5 +26,7 @@ Currently only tested for Windows; AIMP for Linux support is not specifically in
 -   AIMP has a track change notification via messages; create an implmentation for it
 
 # License
+
+This repository is offered under the GNU LGPLv3 License.
 
 See `LICENSE` for more information regarding the licensing of the code in this repository.
