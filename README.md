@@ -24,6 +24,7 @@ Currently only tested for Windows; AIMP for Linux support is not specifically in
 # To-do
 
 -   AIMP has a track change notification via messages; create an implmentation for it
+-   Fix reading values when tracks use multicode point unicode, somehow
 
 # License
 
